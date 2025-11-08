@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <button onclick="getProducts()">Get Products</button>
+    <button onclick="Login()">Login</button>
+    <button onclick="getProductsById()">Get Products id=4</button>
+
+    <div id="divProducts"></div>
+        
+    <script>
+
+        const Login = async () =>{
+            const response = await fetch("http://localhost:5245/api/users/login", {
+                headers: {
+                    "Accecpt": "application/json",
+                    "Content-Type": "application/json",
+                },
+                method: "POST",
+                body: JSON.stringify({ email: 'info@yusuf.com', password: '123'})
+            });
+            const result = await response.json();
+            localStorage.setItem("token", JSON.stringify(result.token));
+        }
+
+        const getProducts = async () => { //fetch api
+            const response = await fetch("http://localhost:5245/api/products")
+            const products = await response.json();
+            console.log(products);
+            displayProducts(products);
+        }  
+
+        const getProductsById = async () => { //fetch api
+            const token = JSON.parse(localStorage.getItem("token"));
+            const response = await fetch("http://localhost:5245/api/products/4", {
+                headers: { Authorization: `Bearer ${token}`}
+            });
+            const product = await response.json();
+            displayProduct(product)
+        }  
+
+        const displayProduct = (products) => {  
+            const parent = document.getElementById("divProducts");           
+            parent.innerHTML += `
+                <div>
+                    <h5>${products.productName}</h5>
+                    <p>${products.price}</p>
+                </div>
+            `;
+            
+        }
+
+
+
+        const displayProducts = (products) => {  //arrow function es6 -- function displayProducts(product){} ayni ifade
+            const parent = document.getElementById("divProducts");
+
+            products.forEach(prd => {
+                parent.innerHTML += `
+                    <div>
+                        <h5>${prd.productName}</h5>
+                        <p>${prd.price}</p>
+                    </div>
+                `
+            });
+        }
+
+        
+
+
+
+    </script>
+</body>
+</html>
